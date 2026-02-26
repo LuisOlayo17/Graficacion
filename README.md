@@ -1,29 +1,52 @@
 # 1.1 Historia y Evolución de la Graficación por Computadora
 
-La graficación por computadora es una disciplina que estudia la generación, manipulación y representación de imágenes mediante sistemas computacionales.
+La graficación por computadora es una disciplina de la informática que se encarga de la creación, manipulación y representación de imágenes digitales mediante algoritmos matemáticos y procesos computacionales. Su evolución ha estado estrechamente ligada al desarrollo del hardware y del software.
 
-## Orígenes (1950-1960)
+## Orígenes (Década de 1950)
 
-En la década de 1950 se comenzaron a utilizar osciloscopios para mostrar gráficos simples.  
-En 1963, Ivan Sutherland desarrolló Sketchpad, considerado el primer sistema de diseño asistido por computadora (CAD).
+En los años cincuenta, las computadoras comenzaron a utilizar tubos de rayos catódicos (CRT) para representar información visual básica. Estos sistemas eran capaces de dibujar líneas simples mediante el control de haces electrónicos. Los gráficos eran vectoriales y muy limitados en complejidad.
 
+## Sketchpad y la Interacción Gráfica (1963)
 
-## Desarrollo (1970-1990)
+Un hito fundamental fue el desarrollo de Sketchpad por Ivan Sutherland en el MIT. Este sistema permitió la interacción directa con objetos gráficos mediante un lápiz óptico. Introdujo conceptos como:
 
-Durante estas décadas se desarrollaron:
+- Representación jerárquica de objetos.
+- Restricciones geométricas.
+- Interacción hombre-máquina.
 
-- Algoritmos de rasterización
-- Modelos de iluminación
-- Representaciones tridimensionales
-- Simuladores de vuelo
+Sketchpad es considerado el precursor del diseño asistido por computadora (CAD).
 
-## Era moderna (2000-Actualidad)
+## Avances en los años 70 y 80
 
-- Uso de GPU
-- Renderizado en tiempo real
-- Ray Tracing
-- Realidad Virtual y Aumentada
-- Inteligencia Artificial aplicada a gráficos
+Durante este periodo se desarrollaron algoritmos fundamentales como:
+
+- Algoritmo de Bresenham para trazado de líneas.
+- Algoritmos de rasterización.
+- Modelos de sombreado (Gouraud y Phong).
+- Técnicas de eliminación de superficies ocultas.
+
+También comenzaron las primeras películas con gráficos generados por computadora y simuladores de vuelo.
+
+## Era de las GPU (Década de 1990)
+
+Con la aparición de las Unidades de Procesamiento Gráfico (GPU), el procesamiento de gráficos se volvió más eficiente. Esto permitió:
+
+- Videojuegos 3D en tiempo real.
+- Renderizado acelerado por hardware.
+- Texturización avanzada.
+- Modelado tridimensional complejo.
+
+## Actualidad
+
+Hoy en día la graficación incluye:
+
+- Ray Tracing en tiempo real.
+- Inteligencia artificial aplicada a renderizado.
+- Realidad virtual (VR) y realidad aumentada (AR).
+- Simulación física avanzada.
+- Motores gráficos como Unreal Engine y Unity.
+
+La evolución continúa impulsada por la necesidad de mayor realismo y eficiencia computacional.
 
 ![Magnavox Odyssey_thumb](https://github.com/user-attachments/assets/7eef34f5-0518-4d78-94f2-060c50e316e1)
 
@@ -173,3 +196,77 @@ La iluminación en Blender se basa en:
 Se pueden modificar parámetros como rugosidad, especularidad y reflexión para obtener mayor realismo.
 
 ![maxresdefault](https://github.com/user-attachments/assets/a2f2e730-76f5-4518-a14f-e4bd499ced84)
+
+
+# 1.5. Representación y trazo de líneas y polígonos
+Este tema explica cómo la computadora "une los puntos". Los archivos muestran dos formas de representar geometría:
+
+### A. Primitivas Geométricas (Flor de vida.py)
+Blender ya tiene funciones predefinidas para crear formas básicas.
+
+* Uso de primitive_circle_add: Es una función de alto nivel que genera automáticamente los vértices y aristas de un círculo.
+
+* Resolución: El parámetro vertices=64 define qué tan "suave" se ve el polígono que imita al círculo.
+
+### B. Representación de Datos de Malla (Poligono2d.py)
+Este script es mucho más técnico y cercano a cómo funcionan los motores de renderizado internamente:
+
+* Vértices (Vertices): La lista de puntos en el espacio.
+
+* Aristas (Edges): La conexión lógica entre índices de vértices. En el código: aristas.append((i, (i + 1) % lados)).
+
+  * Nota Pro: El uso de % lados (módulo) es un truco de programación para cerrar el polígono, uniendo el último vértice con el primero.
+
+* Estructura de Datos: Se usa malla.from_pydata(vertices, aristas, []), que es la forma fundamental de construir objetos geométricos desde cero en sistemas computacionales.
+<img width="682" height="538" alt="image" src="https://github.com/user-attachments/assets/687d72e4-9746-4680-882b-7a14ae1bb038" />
+<img width="862" height="566" alt="image" src="https://github.com/user-attachments/assets/0f9b2bc9-483a-4e40-8c95-c40cbc5962b5" />
+
+
+## 1.6 Formatos de Imagen
+
+Aunque los scripts están enfocados en trabajar con geometría basada en vectores, el último paso dentro del proceso de graficación es el **rasterizado**, que consiste en transformar esos vectores en píxeles para generar una imagen final.
+
+### Vectores vs. Mapas de Bits
+
+Los archivos `.py` generan gráficos vectoriales. Esto significa que dentro de Blender puedes hacer zoom sin que la imagen pierda calidad o se pixele.
+
+Sin embargo, cuando el proyecto se renderiza a un formato como `.PNG`, el resultado se convierte en un mapa de bits (bitmap), es decir, una imagen formada por píxeles.
+
+### Espacio de Color
+
+Blender trabaja por defecto con el modelo de color **RGB** (Red, Green, Blue).
+
+Si se desea modificar un color mediante código, es necesario asignar valores normalizados a cada canal de color, dentro de un rango de:
+
+0.0 a 1.0
+
+Por ejemplo:
+
+```python
+color = (1.0, 0.0, 0.0)  # Rojo puro en RGB normalizado
+```
+
+Tabla comparativa
+| Concepto    | Flor_de_vida.py                            | Poligono2d.py                                |
+| ----------- | ------------------------------------------ | -------------------------------------------- |
+| Lógica      | Utiliza un bucle `while` basado en ángulos | Utiliza un bucle `for` según número de lados |
+| Abstracción | Alta (usa funciones propias de Blender)    | Baja (define vértices manualmente)           |
+| Propósito   | Generar patrones geométricos complejos     | Crear estructuras básicas de polígonos       |
+
+### Recomendación Técnica
+
+En el script Flor_de_vida.py, es importante verificar que el valor del paso_angular sea un divisor exacto de 360°.
+
+Esto garantiza que la figura cierre correctamente sin dejar espacios abiertos.
+
+Por ejemplo, usar 60 grados permite obtener una simetría hexagonal perfecta, ya que:
+
+360 / 60 = 6
+
+### Parámetros de la Figura
+```python
+# Parámetros principales
+radio = 3
+angulo_actual = 0
+paso_angular = 60
+```
